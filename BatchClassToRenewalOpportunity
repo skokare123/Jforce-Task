@@ -1,0 +1,42 @@
+public class BatchClassToRenewalOpp implements Database.Batchable<SObject>{
+
+public Database.QueryLocator start(Database.batchableContext bc){
+
+return Database.getQueryLocator('SELECT ID,AccountId,Name,CloseDate,StageName,Amount,owner.Email From Opportunity' );
+}
+
+public void execute(Database.BatchableContext bc, List<Opportunity> oppList){
+
+List<Opportunity> oppListToInsert = new List<Opportunity>();
+List<Messaging.SingleEmailMessage> mails= new List<Messaging.SingleEmailMessage>();
+for(Opportunity opp:oppList){
+if(Opp.StageName=='Closed Won' ){
+Opportunity newopp = new Opportunity();
+
+newopp.Name='Renewal -'+opp.Name;
+newopp.StageName='Prospecting';
+newopp.CloseDate= opp.CloseDate.addYears(1).addDays(-90);
+newopp.Amount=opp.Amount;
+newopp.AccountId =opp.AccountId;
+oppListToInsert.add(newopp);
+
+Messaging.SingleEmailMessage mail= new Messaging.SingleEmailMessage();
+mail.setToAddresses(new String[]{opp.owner.Email});
+mail.setSubject('Renewal Opportunity created Sucessfully');
+mail.setPlainTextBody('Renewal created for Opportunity: '+opp.Name);
+    mails.add(mail); 
+}
+}
+if (!oppListToInsert.isEmpty()) {
+    insert oppListToInsert;
+}
+if (!mails.isEmpty()) {
+    Messaging.sendEmail(mails);
+}
+}
+
+public void finish(Database.batchableContext bc){
+system.debug('Renewal Opportunity Created');
+}
+
+}
