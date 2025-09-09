@@ -1,0 +1,32 @@
+public with sharing class CreateContactByLWC {
+    @AuraEnabled(cacheable=true)
+    public Static List<Account> getAccount() {
+    return [SELECT Id, Name FROM Account LIMIT 100];
+    }
+
+    @AuraEnabled
+    public static Contact saveContact(String firstName, String lastName, String email, String phone, String accountId){
+       if(String.isBlank(accountId)) {
+           throw new AuraHandledException('Please select an account');
+       }
+       if(String.isBlank(lastName)) {
+           throw new AuraHandledException('Please select an account');
+       }
+       if(String.isBlank(email)) {
+        List<Contact> dupContacts = [SELECT Id FROM Contact WHERE Email = :email AND AccountId = :accountId];
+        if(dupContacts.size() > 0) {
+            throw new AuraHandledException('Contact already exists');
+        }
+
+       }
+       Contact con = new Contact();
+        con.FirstName = firstName;
+        con.LastName = lastName;
+        con.Email = email;
+        con.Phone = phone;
+        con.AccountId = accountId;
+        insert con;
+
+        return con;
+    }
+}
