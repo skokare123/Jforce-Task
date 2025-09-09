@@ -1,0 +1,53 @@
+import { LightningElement } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import getAccDat from '@salesforce/apex/CreateContactByLWC.getAccount';
+import saveContactlwc  from '@salesforce/apex/CreateContactByLWC.saveContact';
+
+export default class Savecontact extends LightningElement {
+accountId;
+accountoptions;
+firstName;
+lastName;
+email;
+phone;
+
+connectedCallback(){
+    this.loadAccunts();
+}
+
+async loadAccunts(){
+    let accList = await getAccDat();
+    this.accountoptions = accList.map(acc =>({
+        label:acc.Name,
+        value:acc.Id
+        }));
+    }
+    catch(error){ this.ShowToast('Error',error.body.message,'error'); }
+
+    handleChange(event){
+        this[event.target.name]=event.target.value;
+    }
+
+    handleSave(){
+        saveContactlwc({firstName:this.firstName,lastName:this.lastName,email:this.email,phone:this.phone,accountId:this.accountId})
+        .then(result=>{
+           
+            const evt = new ShowToastEvent({
+            title: 'Saved !!',
+            message: 'Contact Created Successfully' ,
+            variant: 'success',
+        });
+        this.dispatchEvent(evt);
+        })
+        .catch(error => {
+    
+    const evt = new ShowToastEvent({
+            title: 'Not Saved !!',
+            message: 'Duplicate Contact Found!!! ',
+            variant: 'error',
+        });
+        this.dispatchEvent(evt);
+
+    });
+    }
+}
