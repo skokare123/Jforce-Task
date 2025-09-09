@@ -1,0 +1,60 @@
+<template>
+   <lightning-card icon-name="standard:account" variant="base">
+     <div slot="title">
+         Create New Contact
+     </div>
+     <div slot="actions">
+   
+     </div>
+     <div slot="footer">
+   
+     </div>
+     <div>
+       <lightning-combobox
+        name='accountId'
+        label='Select Account'
+        required='true'
+        value={accountId}
+        placeholder='Select Account'
+        options={accountoptions}
+        onchange={handleChange}
+       ></lightning-combobox>
+
+       <lightning-input
+        name='firstName'
+        label='First Name'
+        required='true'
+        value={firstName}
+        onchange={handleChange}></lightning-input>
+
+        <lightning-input
+        name='lastName'
+        label='Last Name'
+        required='true'
+        value={lastName}
+        onchange={handleChange}>
+        </lightning-input>
+
+        <lightning-input
+        name='email'
+        label='Email'
+        value={email}
+        onchange={handleChange}>
+        </lightning-input>
+       
+        <lightning-input
+        name='phone'
+        label='Phone'
+        value={phone}
+        onchange={handleChange}>
+        </lightning-input>
+
+        <lightning-button variant='brand' label='Save' title='Save' onclick={handleSave} class='cssClass'>
+        </lightning-button>
+
+        <lightning-button variant='neutral' label='Clear' title='Clear' onclick={handleClear} class='cssClass'>
+        </lightning-button>
+       
+     </div>
+   </lightning-card> 
+</template>
